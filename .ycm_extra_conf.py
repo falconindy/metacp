@@ -59,8 +59,4 @@ flags = Flatten(map(GetFlagsFromMakefile, [
   'CFLAGS',
 ]))
 
-# these flags cause crashes in libclang, so remove them
-flags.remove('-Wlogical-op')
-flags.remove('-Wsuggest-attribute=noreturn')
-
 # vim: set et ts=2 sw=2:

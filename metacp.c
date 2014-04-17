@@ -54,18 +54,24 @@ static int copy_acl(_unused_ properties_t propmask,
 
 static int copy_capabilities(_unused_ properties_t propmask,
     const struct file_t *source, const struct file_t *dest) {
-  _cleanup_cap_ cap_t source_caps;
+  _cleanup_cap_ cap_t caps = NULL;
 
   /* capabilities on anything other than a regular file is undefined. */
   if (!S_ISREG(source->st.st_mode) || !S_ISREG(dest->st.st_mode))
     return 0;
 
-  source_caps = cap_get_fd(source->fd);
-  if (source_caps == NULL)
-    /* ENODATA means there's no caps to copy */
-    return errno == ENODATA ? 0 : -errno;
+  caps = cap_get_fd(source->fd);
+  if (caps == NULL) {
+    /* ENODATA signifies success, but a lack of caps on the file */
+    if (errno != ENODATA)
+      return -errno;
 
-  if (cap_set_fd(dest->fd, source_caps) < 0)
+    caps = cap_init();
+    if (caps == NULL)
+      return -errno;
+  }
+
+  if (cap_set_fd(dest->fd, caps) < 0)
     return -errno;
 
   return 0;

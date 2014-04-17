@@ -108,12 +108,12 @@ static int copy_properties_by_fileobj(properties_t propmask,
     properties_t propmask;
     const char *desc;
   } copiers[] = {
-    { copy_permissions, PROPERTY_UID|PROPERTY_GID, "permissions" },
-    { copy_filetimes , PROPERTY_MTIME|PROPERTY_ATIME, "filetimes" },
-    { copy_mode, PROPERTY_MODE, "mode"},
-    { copy_acl, PROPERTY_ACL, "acl" },
-    { copy_capabilities, PROPERTY_CAPABILITIES, "capabilities" },
-    { copy_xattrs, PROPERTY_XATTRS, "xattrs" },
+    { copy_permissions,  PROPERTY_UID|PROPERTY_GID,     "permissions" },
+    { copy_filetimes,    PROPERTY_MTIME|PROPERTY_ATIME, "filetimes" },
+    { copy_mode,         PROPERTY_MODE,                 "mode"},
+    { copy_acl,          PROPERTY_ACL,                  "acl" },
+    { copy_capabilities, PROPERTY_CAPABILITIES,         "capabilities" },
+    { copy_xattrs,       PROPERTY_XATTRS,               "xattrs" },
     { NULL, 0, NULL },
   };
   int r = 0;
@@ -126,7 +126,7 @@ static int copy_properties_by_fileobj(properties_t propmask,
 
     k = copier->copy_fn(propmask, source, dest);
     if (k < 0) {
-      fprintf(stderr, "error: failed to copy %s to destination: %s\n",
+      fprintf(stderr, "error: failed to copy %s: %s\n",
           copier->desc, strerror(-k));
       if (r == 0)
         r = k;

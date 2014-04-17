@@ -145,14 +145,14 @@ static int copy_properties_by_path(properties_t propmask, const char *in,
   if (r < 0) {
     fprintf(stderr, "error: failed to open source file %s: %s\n",
         in, strerror(-r));
-    return -errno;
+    return r;
   }
 
   r = file_open(&dest, out, O_WRONLY|O_APPEND);
-  if (dest.fd < 0) {
+  if (r < 0) {
     fprintf(stderr, "error: failed to open destination file %s: %s\n",
         out, strerror(-r));
-    return -errno;
+    return r;
   }
 
   return copy_properties_by_fileobj(propmask, &source, &dest);

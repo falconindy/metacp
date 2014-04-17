@@ -110,24 +110,23 @@ static int copy_properties_by_fileobj(properties_t propmask,
     { copy_acl,          PROPERTY_ACL,                  S_IFMT,  "acl" },
     { copy_capabilities, PROPERTY_CAPABILITIES,         S_IFREG, "capabilities" },
     { copy_xattrs,       PROPERTY_XATTRS,               S_IFMT,  "xattrs" },
-    { NULL, 0, 0, NULL },
   };
   int r = 0;
 
-  for (const struct copier *copier = copiers; copier->copy_fn; ++copier) {
+  for (unsigned i = 0; i < ARRAYSIZE(copiers); ++i) {
     int k;
 
-    if (!(propmask & copier->propmask))
+    if (!(propmask & copiers[i].propmask))
       continue;
 
-    if (!(source->st.st_mode & copier->filetypemask) ||
-        !(dest->st.st_mode & copier->filetypemask))
+    if (!(source->st.st_mode & copiers[i].filetypemask) ||
+        !(dest->st.st_mode & copiers[i].filetypemask))
       continue;
 
-    k = copier->copy_fn(propmask, source, dest);
+    k = copiers[i].copy_fn(propmask, source, dest);
     if (k < 0) {
       fprintf(stderr, "error: failed to copy %s: %s\n",
-          copier->desc, strerror(-k));
+          copiers[i].desc, strerror(-k));
       if (r == 0)
         r = k;
     }

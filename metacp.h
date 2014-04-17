@@ -17,7 +17,7 @@ typedef enum {
   PROPERTY_CAPABILITIES = 0x1 << 6,
   PROPERTY_XATTRS = 0x1 << 7,
 
-  PROPERTY_ALL = (0x1 << 8) - 1,
+  PROPERTY_ALL = (0x1 << 30) - 1,
   /* sentinel */
   _PROPERTY_INVALID = -1,
 } properties_t;
@@ -30,6 +30,8 @@ struct file_t {
 
 typedef int (*copy_property)(properties_t propmask, const struct file_t *source,
     const struct file_t *dest);
+
+#define ARRAYSIZE(x) (sizeof(x)/sizeof((x)[0]))
 
 #define _noreturn_ __attribute__((noreturn))
 #define _unused_ __attribute__((unused))

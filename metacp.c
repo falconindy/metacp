@@ -55,10 +55,6 @@ static int copy_capabilities(_unused_ properties_t propmask,
     const struct file_t *source, const struct file_t *dest) {
   _cleanup_cap_ cap_t caps = NULL;
 
-  /* capabilities on anything other than a regular file is undefined. */
-  if (!S_ISREG(source->st.st_mode) || !S_ISREG(dest->st.st_mode))
-    return 0;
-
   caps = cap_get_fd(source->fd);
   if (caps == NULL) {
     /* ENODATA signifies success, but a lack of caps on the file */
@@ -104,15 +100,16 @@ static int copy_properties_by_fileobj(properties_t propmask,
   static const struct copier {
     copy_property copy_fn;
     properties_t propmask;
+    int filetypemask;
     const char *desc;
   } copiers[] = {
-    { copy_permissions,  PROPERTY_UID|PROPERTY_GID,     "permissions" },
-    { copy_filetimes,    PROPERTY_MTIME|PROPERTY_ATIME, "filetimes" },
-    { copy_mode,         PROPERTY_MODE,                 "mode"},
-    { copy_acl,          PROPERTY_ACL,                  "acl" },
-    { copy_capabilities, PROPERTY_CAPABILITIES,         "capabilities" },
-    { copy_xattrs,       PROPERTY_XATTRS,               "xattrs" },
-    { NULL, 0, NULL },
+    { copy_permissions,  PROPERTY_UID|PROPERTY_GID,     S_IFMT,  "permissions" },
+    { copy_filetimes,    PROPERTY_MTIME|PROPERTY_ATIME, S_IFMT,  "filetimes" },
+    { copy_mode,         PROPERTY_MODE,                 S_IFMT,  "mode"},
+    { copy_acl,          PROPERTY_ACL,                  S_IFMT,  "acl" },
+    { copy_capabilities, PROPERTY_CAPABILITIES,         S_IFREG, "capabilities" },
+    { copy_xattrs,       PROPERTY_XATTRS,               S_IFMT,  "xattrs" },
+    { NULL, 0, 0, NULL },
   };
   int r = 0;
 
@@ -120,6 +117,10 @@ static int copy_properties_by_fileobj(properties_t propmask,
     int k;
 
     if (!(propmask & copier->propmask))
+      continue;
+
+    if (!(source->st.st_mode & copier->filetypemask) ||
+        !(dest->st.st_mode & copier->filetypemask))
       continue;
 
     k = copier->copy_fn(propmask, source, dest);

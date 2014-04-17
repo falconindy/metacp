@@ -42,11 +42,12 @@ static int copy_acl(_unused_ properties_t propmask,
   if (acl == NULL)
     return errno == ENOTSUP ? 0 : -errno;
 
-  if (acl_set_fd(dest->fd, acl) < 0)
+  if (acl_set_fd(dest->fd, acl) < 0) {
     if (errno == ENOTSUP)
       fprintf(stderr, "warning: unable to preserve ACL on %s: %s\n",
           dest->path, strerror(errno));
     return -errno;
+  }
 
   return 0;
 }

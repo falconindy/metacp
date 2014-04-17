@@ -183,6 +183,8 @@ static int arg_parse(int *argc, char **argv[]) {
     switch (k) {
       case 'h':
         exit(usage(stdout));
+      default:
+        return -EINVAL;
     }
   }
 

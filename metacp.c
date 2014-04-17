@@ -161,15 +161,44 @@ static int copy_properties_by_path(properties_t propmask, const char *in,
 static int usage(FILE *stream) {
   fprintf(stream,
       "metacp v0\n"
-      "Usage: %s <source> <dest>\n",
+      "Usage: %s <source> <dest>\n\n",
       program_invocation_short_name);
+
+  fputs("  -h, --help              display this help and exit\n",
+      stream);
 
   return stream == stderr;
 }
 
+static int arg_parse(int *argc, char **argv[]) {
+  int r = 0;
+  const char * const shortopts = "h";
+  const struct option longopts[] = {
+    { "help", no_argument, NULL, 'h' },
+  };
+
+  for (;;) {
+    int k = getopt_long(*argc, *argv, shortopts, longopts, NULL);
+    if (k < 0)
+      break;
+
+    switch (k) {
+      case 'h':
+        exit(usage(stdout));
+    }
+  }
+
+  return r;
+}
+
 int main(int argc, char *argv[]) {
-  if (argc < 3)
-    exit(usage(stderr));
+  if (arg_parse(&argc, &argv) < 0)
+    return 1;
+
+  if (argc < 3) {
+    fprintf(stderr, "error: missing source and/or destination\n");
+    return 1;
+  }
 
   return !!copy_properties_by_path(PROPERTY_ALL, argv[1], argv[2]);
 }

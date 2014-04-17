@@ -7,3 +7,6 @@ metacp: metacp.c metacp.h
 
 clean:
 	$(RM) metacp
+
+print-%:
+	@echo $($*)

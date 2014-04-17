@@ -1,4 +1,5 @@
 
+CPPFLAGS := -D_GNU_SOURCE $(CPPFLAGS)
 CFLAGS := -std=c99 -Wall -Wextra -pedantic $(CFLAGS)
 LDLIBS = -lattr -lacl -lcap
 

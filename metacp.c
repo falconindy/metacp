@@ -1,5 +1,3 @@
-#define _GNU_SOURCE
-
 #include <attr/libattr.h>
 #include <errno.h>
 #include <fcntl.h>

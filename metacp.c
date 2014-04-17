@@ -38,15 +38,16 @@ static int copy_mode(_unused_ properties_t propmask,
 
 static int copy_acl(_unused_ properties_t propmask,
     const struct file_t *source, const struct file_t *dest) {
-  _cleanup_acl_ acl_t source_acl;
+  _cleanup_acl_ acl_t acl;
 
-  source_acl = acl_get_fd(source->fd);
-  if (source_acl == NULL)
-    /* silently pass on filesystems which do not support ACLs */
+  acl = acl_get_fd(source->fd);
+  if (acl == NULL)
     return errno == ENOTSUP ? 0 : -errno;
 
-  /* TODO: should we ignore ENOTSUP here, or warn? */
-  if (acl_set_fd(dest->fd, source_acl))
+  if (acl_set_fd(dest->fd, acl) < 0)
+    if (errno == ENOTSUP)
+      fprintf(stderr, "warning: unable to preserve ACL on %s: %s\n",
+          dest->path, strerror(errno));
     return -errno;
 
   return 0;

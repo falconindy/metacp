@@ -14,7 +14,9 @@ Currently, it understands:
 ## TODO
 
 * add recursive copies (will likely need an --ignore-missing flag, or so)
-* fine grained control over what gets copied
+* fine grained control over what gets copied (--preserve=acl,nomode,mtime etc)
 * add a verbose mode
 * allow compilation without xattr support
+* implement xattr support on raw syscalls
+* implement (de)serialization formats (e.g. for transfer across hosts)
 * write a manpage
